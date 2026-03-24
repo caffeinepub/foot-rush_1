@@ -8,10 +8,237 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const idlService = IDL.Service({});
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
+export const OrderItem = IDL.Record({
+  'size' : IDL.Text,
+  'productId' : IDL.Nat,
+  'quantity' : IDL.Nat,
+  'price' : IDL.Float64,
+});
+export const Order = IDL.Record({
+  'id' : IDL.Nat,
+  'status' : IDL.Text,
+  'total' : IDL.Float64,
+  'customerPrincipal' : IDL.Principal,
+  'createdAt' : IDL.Int,
+  'items' : IDL.Vec(OrderItem),
+});
+export const UserProfile = IDL.Record({
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+});
+export const Product = IDL.Record({
+  'id' : IDL.Nat,
+  'name' : IDL.Text,
+  'isActive' : IDL.Bool,
+  'sizes' : IDL.Vec(IDL.Text),
+  'category' : IDL.Text,
+  'badge' : IDL.Opt(IDL.Text),
+  'brand' : IDL.Text,
+  'rating' : IDL.Float64,
+  'image' : IDL.Text,
+  'price' : IDL.Float64,
+  'reviewCount' : IDL.Nat,
+});
+
+export const idlService = IDL.Service({
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'addProduct' : IDL.Func(
+      [
+        IDL.Record({
+          'name' : IDL.Text,
+          'sizes' : IDL.Vec(IDL.Text),
+          'category' : IDL.Text,
+          'badge' : IDL.Opt(IDL.Text),
+          'brand' : IDL.Text,
+          'rating' : IDL.Float64,
+          'image' : IDL.Text,
+          'price' : IDL.Float64,
+          'reviewCount' : IDL.Nat,
+        }),
+      ],
+      [IDL.Nat],
+      [],
+    ),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+  'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getMyOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+  'getMyWishlist' : IDL.Func([], [IDL.Vec(IDL.Nat)], ['query']),
+  'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(Product)], ['query']),
+  'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
+  'getSubscribers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
+  'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'placeOrder' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], []),
+  'removeProduct' : IDL.Func([IDL.Nat], [], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'seedProducts' : IDL.Func(
+      [
+        IDL.Vec(
+          IDL.Record({
+            'name' : IDL.Text,
+            'sizes' : IDL.Vec(IDL.Text),
+            'category' : IDL.Text,
+            'badge' : IDL.Opt(IDL.Text),
+            'brand' : IDL.Text,
+            'rating' : IDL.Float64,
+            'image' : IDL.Text,
+            'price' : IDL.Float64,
+            'reviewCount' : IDL.Nat,
+          })
+        ),
+      ],
+      [],
+      [],
+    ),
+  'subscribeNewsletter' : IDL.Func([IDL.Text], [IDL.Bool], []),
+  'toggleWishlist' : IDL.Func([IDL.Nat], [], []),
+  'updateOrderStatus' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+  'updateProduct' : IDL.Func(
+      [
+        IDL.Nat,
+        IDL.Record({
+          'name' : IDL.Text,
+          'sizes' : IDL.Vec(IDL.Text),
+          'category' : IDL.Text,
+          'badge' : IDL.Opt(IDL.Text),
+          'brand' : IDL.Text,
+          'rating' : IDL.Float64,
+          'image' : IDL.Text,
+          'price' : IDL.Float64,
+          'reviewCount' : IDL.Nat,
+        }),
+      ],
+      [],
+      [],
+    ),
+});
 
 export const idlInitArgs = [];
 
-export const idlFactory = ({ IDL }) => { return IDL.Service({}); };
+export const idlFactory = ({ IDL }) => {
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
+  const OrderItem = IDL.Record({
+    'size' : IDL.Text,
+    'productId' : IDL.Nat,
+    'quantity' : IDL.Nat,
+    'price' : IDL.Float64,
+  });
+  const Order = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : IDL.Text,
+    'total' : IDL.Float64,
+    'customerPrincipal' : IDL.Principal,
+    'createdAt' : IDL.Int,
+    'items' : IDL.Vec(OrderItem),
+  });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text, 'email' : IDL.Text });
+  const Product = IDL.Record({
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
+    'isActive' : IDL.Bool,
+    'sizes' : IDL.Vec(IDL.Text),
+    'category' : IDL.Text,
+    'badge' : IDL.Opt(IDL.Text),
+    'brand' : IDL.Text,
+    'rating' : IDL.Float64,
+    'image' : IDL.Text,
+    'price' : IDL.Float64,
+    'reviewCount' : IDL.Nat,
+  });
+  
+  return IDL.Service({
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'addProduct' : IDL.Func(
+        [
+          IDL.Record({
+            'name' : IDL.Text,
+            'sizes' : IDL.Vec(IDL.Text),
+            'category' : IDL.Text,
+            'badge' : IDL.Opt(IDL.Text),
+            'brand' : IDL.Text,
+            'rating' : IDL.Float64,
+            'image' : IDL.Text,
+            'price' : IDL.Float64,
+            'reviewCount' : IDL.Nat,
+          }),
+        ],
+        [IDL.Nat],
+        [],
+      ),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getMyOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+    'getMyWishlist' : IDL.Func([], [IDL.Vec(IDL.Nat)], ['query']),
+    'getProduct' : IDL.Func([IDL.Nat], [IDL.Opt(Product)], ['query']),
+    'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
+    'getSubscribers' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'placeOrder' : IDL.Func([IDL.Vec(OrderItem)], [IDL.Nat], []),
+    'removeProduct' : IDL.Func([IDL.Nat], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'seedProducts' : IDL.Func(
+        [
+          IDL.Vec(
+            IDL.Record({
+              'name' : IDL.Text,
+              'sizes' : IDL.Vec(IDL.Text),
+              'category' : IDL.Text,
+              'badge' : IDL.Opt(IDL.Text),
+              'brand' : IDL.Text,
+              'rating' : IDL.Float64,
+              'image' : IDL.Text,
+              'price' : IDL.Float64,
+              'reviewCount' : IDL.Nat,
+            })
+          ),
+        ],
+        [],
+        [],
+      ),
+    'subscribeNewsletter' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'toggleWishlist' : IDL.Func([IDL.Nat], [], []),
+    'updateOrderStatus' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'updateProduct' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Record({
+            'name' : IDL.Text,
+            'sizes' : IDL.Vec(IDL.Text),
+            'category' : IDL.Text,
+            'badge' : IDL.Opt(IDL.Text),
+            'brand' : IDL.Text,
+            'rating' : IDL.Float64,
+            'image' : IDL.Text,
+            'price' : IDL.Float64,
+            'reviewCount' : IDL.Nat,
+          }),
+        ],
+        [],
+        [],
+      ),
+  });
+};
 
 export const init = ({ IDL }) => { return []; };

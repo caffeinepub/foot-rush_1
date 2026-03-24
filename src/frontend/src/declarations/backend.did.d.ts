@@ -10,7 +10,108 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface _SERVICE {}
+export interface Order {
+  'id' : bigint,
+  'status' : string,
+  'total' : number,
+  'customerPrincipal' : Principal,
+  'createdAt' : bigint,
+  'items' : Array<OrderItem>,
+}
+export interface OrderItem {
+  'size' : string,
+  'productId' : bigint,
+  'quantity' : bigint,
+  'price' : number,
+}
+export interface Product {
+  'id' : bigint,
+  'name' : string,
+  'isActive' : boolean,
+  'sizes' : Array<string>,
+  'category' : string,
+  'badge' : [] | [string],
+  'brand' : string,
+  'rating' : number,
+  'image' : string,
+  'price' : number,
+  'reviewCount' : bigint,
+}
+export interface UserProfile { 'name' : string, 'email' : string }
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
+export interface _SERVICE {
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'addProduct' : ActorMethod<
+    [
+      {
+        'name' : string,
+        'sizes' : Array<string>,
+        'category' : string,
+        'badge' : [] | [string],
+        'brand' : string,
+        'rating' : number,
+        'image' : string,
+        'price' : number,
+        'reviewCount' : bigint,
+      },
+    ],
+    bigint
+  >,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'getAllOrders' : ActorMethod<[], Array<Order>>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getMyOrders' : ActorMethod<[], Array<Order>>,
+  'getMyWishlist' : ActorMethod<[], Array<bigint>>,
+  'getProduct' : ActorMethod<[bigint], [] | [Product]>,
+  'getProducts' : ActorMethod<[], Array<Product>>,
+  'getSubscribers' : ActorMethod<[], Array<string>>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
+  'placeOrder' : ActorMethod<[Array<OrderItem>], bigint>,
+  'removeProduct' : ActorMethod<[bigint], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'seedProducts' : ActorMethod<
+    [
+      Array<
+        {
+          'name' : string,
+          'sizes' : Array<string>,
+          'category' : string,
+          'badge' : [] | [string],
+          'brand' : string,
+          'rating' : number,
+          'image' : string,
+          'price' : number,
+          'reviewCount' : bigint,
+        }
+      >,
+    ],
+    undefined
+  >,
+  'subscribeNewsletter' : ActorMethod<[string], boolean>,
+  'toggleWishlist' : ActorMethod<[bigint], undefined>,
+  'updateOrderStatus' : ActorMethod<[bigint, string], undefined>,
+  'updateProduct' : ActorMethod<
+    [
+      bigint,
+      {
+        'name' : string,
+        'sizes' : Array<string>,
+        'category' : string,
+        'badge' : [] | [string],
+        'brand' : string,
+        'rating' : number,
+        'image' : string,
+        'price' : number,
+        'reviewCount' : bigint,
+      },
+    ],
+    undefined
+  >,
+}
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;

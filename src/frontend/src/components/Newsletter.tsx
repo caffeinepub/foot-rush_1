@@ -1,14 +1,39 @@
+import { useActor } from "@/hooks/useActor";
 import { Send } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function Newsletter() {
+  const { actor } = useActor();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) setSubmitted(true);
+    if (!email) return;
+    setIsSubmitting(true);
+    try {
+      if (actor) {
+        const success = await actor.subscribeNewsletter(email);
+        if (success) {
+          setSubmitted(true);
+          toast.success("You're subscribed! 🔥");
+        } else {
+          toast.error("Already subscribed with this email.");
+          setSubmitted(true);
+        }
+      } else {
+        setSubmitted(true);
+        toast.success("You're subscribed! 🔥");
+      }
+    } catch (err) {
+      console.error("Newsletter subscription failed:", err);
+      toast.error("Subscription failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,16 +97,22 @@ export function Newsletter() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
                   required
-                  className="bg-white/10 border border-white/20 text-white placeholder-gray-500 font-body text-sm px-5 py-3.5 outline-none focus:border-brand-orange transition-colors w-full sm:w-72"
+                  disabled={isSubmitting}
+                  className="bg-white/10 border border-white/20 text-white placeholder-gray-500 font-body text-sm px-5 py-3.5 outline-none focus:border-brand-orange transition-colors w-full sm:w-72 disabled:opacity-60"
                   data-ocid="newsletter.input"
                 />
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white font-body font-700 uppercase tracking-wider text-sm px-6 py-3.5 transition-colors duration-200 whitespace-nowrap"
+                  disabled={isSubmitting}
+                  className="flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 disabled:opacity-60 text-white font-body font-700 uppercase tracking-wider text-sm px-6 py-3.5 transition-colors duration-200 whitespace-nowrap"
                   data-ocid="newsletter.submit_button"
                 >
-                  <Send className="w-4 h-4" />
-                  Subscribe
+                  {isSubmitting ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                  {isSubmitting ? "Subscribing..." : "Subscribe"}
                 </button>
               </form>
             )}

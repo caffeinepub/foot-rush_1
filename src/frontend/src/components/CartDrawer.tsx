@@ -1,7 +1,10 @@
 import { Separator } from "@/components/ui/separator";
 import { useShop } from "@/context/ShopContext";
-import { Minus, Plus, ShoppingBag, X } from "lucide-react";
+import { useActor } from "@/hooks/useActor";
+import { Loader2, Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function CartDrawer() {
   const {
@@ -12,6 +15,34 @@ export function CartDrawer() {
     updateQuantity,
     cartSubtotal,
   } = useShop();
+  const { actor } = useActor();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) return;
+    setIsCheckingOut(true);
+    try {
+      const items = cart.map((item) => ({
+        productId: BigInt(item.product.id),
+        quantity: BigInt(item.quantity),
+        size: item.size ?? item.product.sizes[0] ?? "One Size",
+        price: item.product.price,
+      }));
+      const orderId = actor ? await actor.placeOrder(items) : null;
+      toast.success(
+        `Order${orderId ? ` #${orderId}` : ""} placed successfully! 🎉`,
+      );
+      for (const item of [...cart]) {
+        removeFromCart(item.product.id);
+      }
+      setIsCartOpen(false);
+    } catch (err) {
+      console.error("Checkout failed:", err);
+      toast.error("Checkout failed. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -72,7 +103,10 @@ export function CartDrawer() {
               ) : (
                 <div className="px-6 py-4 space-y-4">
                   {cart.map((item, i) => (
-                    <div key={item.product.id} data-ocid={`cart.item.${i + 1}`}>
+                    <div
+                      key={`${item.product.id}-${item.size}`}
+                      data-ocid={`cart.item.${i + 1}`}
+                    >
                       <div className="flex gap-4">
                         <div className="w-20 h-20 bg-brand-light overflow-hidden shrink-0">
                           <img
@@ -87,9 +121,14 @@ export function CartDrawer() {
                           </h4>
                           <p className="font-body text-xs text-brand-gray mt-0.5">
                             {item.product.brand}
+                            {item.size && (
+                              <span className="ml-2 text-brand-orange font-600">
+                                Size {item.size}
+                              </span>
+                            )}
                           </p>
                           <p className="font-display font-700 text-brand-orange mt-1">
-                            ${item.product.price.toFixed(2)}
+                            ₹{item.product.price.toLocaleString("en-IN")}
                           </p>
                           <div className="flex items-center gap-2 mt-2">
                             <button
@@ -147,7 +186,7 @@ export function CartDrawer() {
                     Subtotal
                   </span>
                   <span className="font-display font-800 text-xl text-gray-900">
-                    ${cartSubtotal.toFixed(2)}
+                    ₹{cartSubtotal.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <p className="font-body text-xs text-brand-gray mb-4">
@@ -155,10 +194,15 @@ export function CartDrawer() {
                 </p>
                 <button
                   type="button"
-                  className="w-full bg-brand-orange hover:bg-orange-600 text-white font-body font-700 uppercase tracking-widest text-sm py-4 transition-colors duration-200"
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                  className="w-full bg-brand-orange hover:bg-orange-600 disabled:opacity-60 text-white font-body font-700 uppercase tracking-widest text-sm py-4 transition-colors duration-200 flex items-center justify-center gap-2"
                   data-ocid="cart.submit_button"
                 >
-                  Checkout
+                  {isCheckingOut && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
+                  {isCheckingOut ? "Placing Order..." : "Checkout"}
                 </button>
               </div>
             )}

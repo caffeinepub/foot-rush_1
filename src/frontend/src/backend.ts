@@ -89,12 +89,562 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface backendInterface {
-    _initializeAccessControlWithSecret(secret: string): Promise<void>;
+export interface OrderItem {
+    size: string;
+    productId: bigint;
+    quantity: bigint;
+    price: number;
 }
+export interface Order {
+    id: bigint;
+    status: string;
+    total: number;
+    customerPrincipal: Principal;
+    createdAt: bigint;
+    items: Array<OrderItem>;
+}
+export interface UserProfile {
+    name: string;
+    email: string;
+}
+export interface Product {
+    id: bigint;
+    name: string;
+    isActive: boolean;
+    sizes: Array<string>;
+    category: string;
+    badge?: string;
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
+}
+export interface backendInterface {
+    _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    addProduct(productData: {
+        name: string;
+        sizes: Array<string>;
+        category: string;
+        badge?: string;
+        brand: string;
+        rating: number;
+        image: string;
+        price: number;
+        reviewCount: bigint;
+    }): Promise<bigint>;
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    getAllOrders(): Promise<Array<Order>>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
+    getCallerUserRole(): Promise<UserRole>;
+    getMyOrders(): Promise<Array<Order>>;
+    getMyWishlist(): Promise<Array<bigint>>;
+    getProduct(id: bigint): Promise<Product | null>;
+    getProducts(): Promise<Array<Product>>;
+    getSubscribers(): Promise<Array<string>>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isCallerAdmin(): Promise<boolean>;
+    placeOrder(items: Array<OrderItem>): Promise<bigint>;
+    removeProduct(id: bigint): Promise<void>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    seedProducts(productList: Array<{
+        name: string;
+        sizes: Array<string>;
+        category: string;
+        badge?: string;
+        brand: string;
+        rating: number;
+        image: string;
+        price: number;
+        reviewCount: bigint;
+    }>): Promise<void>;
+    subscribeNewsletter(email: string): Promise<boolean>;
+    toggleWishlist(productId: bigint): Promise<void>;
+    updateOrderStatus(orderId: bigint, status: string): Promise<void>;
+    updateProduct(id: bigint, productData: {
+        name: string;
+        sizes: Array<string>;
+        category: string;
+        badge?: string;
+        brand: string;
+        rating: number;
+        image: string;
+        price: number;
+        reviewCount: bigint;
+    }): Promise<void>;
+}
+import type { Product as _Product, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async _initializeAccessControlWithSecret(_secret: string): Promise<void> {}
+    async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._initializeAccessControlWithSecret(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._initializeAccessControlWithSecret(arg0);
+            return result;
+        }
+    }
+    async addProduct(arg0: {
+        name: string;
+        sizes: Array<string>;
+        category: string;
+        badge?: string;
+        brand: string;
+        rating: number;
+        image: string;
+        price: number;
+        reviewCount: bigint;
+    }): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addProduct(to_candid_record_n1(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addProduct(to_candid_record_n1(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n2(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n2(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async getAllOrders(): Promise<Array<Order>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllOrders();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllOrders();
+            return result;
+        }
+    }
+    async getCallerUserProfile(): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserProfile();
+                return from_candid_opt_n4(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserProfile();
+            return from_candid_opt_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getCallerUserRole(): Promise<UserRole> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserRole();
+                return from_candid_UserRole_n5(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserRole();
+            return from_candid_UserRole_n5(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getMyOrders(): Promise<Array<Order>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMyOrders();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMyOrders();
+            return result;
+        }
+    }
+    async getMyWishlist(): Promise<Array<bigint>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMyWishlist();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMyWishlist();
+            return result;
+        }
+    }
+    async getProduct(arg0: bigint): Promise<Product | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProduct(arg0);
+                return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProduct(arg0);
+            return from_candid_opt_n7(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getProducts(): Promise<Array<Product>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProducts();
+                return from_candid_vec_n11(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProducts();
+            return from_candid_vec_n11(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getSubscribers(): Promise<Array<string>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getSubscribers();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getSubscribers();
+            return result;
+        }
+    }
+    async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserProfile(arg0);
+                return from_candid_opt_n4(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserProfile(arg0);
+            return from_candid_opt_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isCallerAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isCallerAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async placeOrder(arg0: Array<OrderItem>): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.placeOrder(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.placeOrder(arg0);
+            return result;
+        }
+    }
+    async removeProduct(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.removeProduct(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.removeProduct(arg0);
+            return result;
+        }
+    }
+    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveCallerUserProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveCallerUserProfile(arg0);
+            return result;
+        }
+    }
+    async seedProducts(arg0: Array<{
+        name: string;
+        sizes: Array<string>;
+        category: string;
+        badge?: string;
+        brand: string;
+        rating: number;
+        image: string;
+        price: number;
+        reviewCount: bigint;
+    }>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.seedProducts(to_candid_vec_n12(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.seedProducts(to_candid_vec_n12(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async subscribeNewsletter(arg0: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.subscribeNewsletter(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.subscribeNewsletter(arg0);
+            return result;
+        }
+    }
+    async toggleWishlist(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.toggleWishlist(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.toggleWishlist(arg0);
+            return result;
+        }
+    }
+    async updateOrderStatus(arg0: bigint, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateOrderStatus(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateOrderStatus(arg0, arg1);
+            return result;
+        }
+    }
+    async updateProduct(arg0: bigint, arg1: {
+        name: string;
+        sizes: Array<string>;
+        category: string;
+        badge?: string;
+        brand: string;
+        rating: number;
+        image: string;
+        price: number;
+        reviewCount: bigint;
+    }): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateProduct(arg0, to_candid_record_n1(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateProduct(arg0, to_candid_record_n1(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+}
+function from_candid_Product_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Product): Product {
+    return from_candid_record_n9(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n6(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Product]): Product | null {
+    return value.length === 0 ? null : from_candid_Product_n8(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    name: string;
+    isActive: boolean;
+    sizes: Array<string>;
+    category: string;
+    badge: [] | [string];
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+}): {
+    id: bigint;
+    name: string;
+    isActive: boolean;
+    sizes: Array<string>;
+    category: string;
+    badge?: string;
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+} {
+    return {
+        id: value.id,
+        name: value.name,
+        isActive: value.isActive,
+        sizes: value.sizes,
+        category: value.category,
+        badge: record_opt_to_undefined(from_candid_opt_n10(_uploadFile, _downloadFile, value.badge)),
+        brand: value.brand,
+        rating: value.rating,
+        image: value.image,
+        price: value.price,
+        reviewCount: value.reviewCount
+    };
+}
+function from_candid_variant_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+}): UserRole {
+    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+}
+function from_candid_vec_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Product>): Array<Product> {
+    return value.map((x)=>from_candid_Product_n8(_uploadFile, _downloadFile, x));
+}
+function to_candid_UserRole_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n3(_uploadFile, _downloadFile, value);
+}
+function to_candid_record_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    name: string;
+    sizes: Array<string>;
+    category: string;
+    badge?: string;
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+}): {
+    name: string;
+    sizes: Array<string>;
+    category: string;
+    badge: [] | [string];
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+} {
+    return {
+        name: value.name,
+        sizes: value.sizes,
+        category: value.category,
+        badge: value.badge ? candid_some(value.badge) : candid_none(),
+        brand: value.brand,
+        rating: value.rating,
+        image: value.image,
+        price: value.price,
+        reviewCount: value.reviewCount
+    };
+}
+function to_candid_variant_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+} {
+    return value == UserRole.admin ? {
+        admin: null
+    } : value == UserRole.user ? {
+        user: null
+    } : value == UserRole.guest ? {
+        guest: null
+    } : value;
+}
+function to_candid_vec_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<{
+    name: string;
+    sizes: Array<string>;
+    category: string;
+    badge?: string;
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+}>): Array<{
+    name: string;
+    sizes: Array<string>;
+    category: string;
+    badge: [] | [string];
+    brand: string;
+    rating: number;
+    image: string;
+    price: number;
+    reviewCount: bigint;
+}> {
+    return value.map((x)=>to_candid_record_n1(_uploadFile, _downloadFile, x));
 }
 export interface CreateActorOptions {
     agent?: Agent;
